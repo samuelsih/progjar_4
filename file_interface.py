@@ -39,9 +39,9 @@ class FileInterface:
             if (content_file == ''):
                 raise Exception('Content file must not be empty')
 
-            encoded_content = base64.b64decode(content_file)
+            decoded_content = base64.b64decode(content_file.encode())
             file = open(filename, 'wb')
-            file.write(encoded_content)
+            file.write(decoded_content)
             file.close()
 
             return dict(status='OK', data=f"Name: {filename} Terupload di files/{filename}")
@@ -55,4 +55,4 @@ if __name__=='__main__':
     f = FileInterface()
     # print(f.list())
     # print(f.get(['pokijan.jpg']))
-    print(f.upload(['normal_img.jpg', cc]))
+    print(f.upload(['normal_img.jpg', str(cc)]))

@@ -38,3 +38,28 @@ GET
 - GAGAL:
   - status: ERROR
   - data: pesan kesalahan
+
+UPLOAD
+* TUJUAN: untuk menyimpan gambar ke folder files/
+* PARAMETER:
+  - PARAMETER1 : nama file
+  - PARAMETER2 : hasil encode base64 dari file tersebut 
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: Name: <nama file> Terupload di files/<nama file>
+- GAGAL:
+  - status: ERROR
+  - data: pesan kesalahan
+
+HAPUS
+* TUJUAN: untuk menghapus file yang terdapat di files/
+* PARAMETER:
+  - PARAMETER1 : nama file
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: Name: <nama file> Terhapus
+- GAGAL:
+  - status: ERROR
+  - data: pesan kesalahan

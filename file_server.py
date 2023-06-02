@@ -1,10 +1,12 @@
 from socket import *
+from io import StringIO
 import socket
 import threading
 import logging
 
-from file_protocol import  FileProtocol
+from file_protocol import FileProtocol
 fp = FileProtocol()
+
 
 class ProcessTheClient(threading.Thread):
     def __init__(self, connection, address):
@@ -12,22 +14,33 @@ class ProcessTheClient(threading.Thread):
         self.address = address
         threading.Thread.__init__(self)
 
-    def run(self):
+    def recvall(self, num_bytes) -> str:
+        buffer = StringIO()
+
         while True:
-            data = self.connection.recv(32)
+            data = self.connection.recv(num_bytes)
             if data:
                 d = data.decode()
-                hasil = fp.proses_string(d)
-                hasil=hasil+"\r\n\r\n"
-                self.connection.sendall(hasil.encode())
+                buffer.write(d)
+
+                if len(data) < num_bytes:
+                    break
             else:
                 break
+
+        return buffer.getvalue()
+
+    def run(self):
+        d = self.recvall(4096)
+        hasil = fp.proses_string(d)
+        hasil = hasil+"\r\n\r\n"
+        self.connection.sendall(hasil.encode())
         self.connection.close()
 
 
 class Server(threading.Thread):
-    def __init__(self,ipaddress='0.0.0.0',port=8889):
-        self.ipinfo=(ipaddress,port)
+    def __init__(self, ipaddress='0.0.0.0', port=8889):
+        self.ipinfo = (ipaddress, port)
         self.the_clients = []
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -47,7 +60,7 @@ class Server(threading.Thread):
 
 
 def main():
-    svr = Server(ipaddress='localhost',port=6666)
+    svr = Server(ipaddress='localhost', port=6666)
     svr.start()
 
 

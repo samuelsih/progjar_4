@@ -11,25 +11,26 @@ class FileInterface:
     def list(self, params=[]):
         try:
             filelist = glob('*.*')
-            return dict(status='OK',data=filelist)
+            return dict(status='OK', data=filelist)
         except Exception as e:
-            return dict(status='ERROR',data=str(e))
+            return dict(status='ERROR', data=str(e))
 
-    def get(self,params=[]):
+    def get(self, params=[]):
         try:
             filename = params[0]
             if (filename == ''):
                 return None
-            fp = open(f"{filename}",'rb')
+            fp = open(f"{filename}", 'rb')
             isifile = base64.b64encode(fp.read()).decode()
-            return dict(status='OK',data_namafile=filename,data_file=isifile)
+            return dict(status='OK', data_namafile=filename, data_file=isifile)
         except Exception as e:
-            return dict(status='ERROR',data=str(e))
-        
-    def upload(self, params=[]):
+            return dict(status='ERROR', data=str(e))
+
+    def upload(self, params=[]) -> dict:
         try:
             if (len(params) != 2):
-                raise Exception('Please provide correct params: <FILENAME> <CONTENT_FILE>')
+                raise Exception(
+                    'Please provide correct params: <FILENAME> <CONTENT_FILE>')
 
             filename = params[0]
             if (filename == ''):
@@ -39,16 +40,34 @@ class FileInterface:
             if (content_file == ''):
                 raise Exception('Content file must not be empty')
 
-            decoded_content = base64.b64decode(content_file.encode())
-            file = open(filename, 'wb')
-            file.write(decoded_content)
-            file.close()
+            decoded_content = base64.b64decode(content_file)
+            with open(filename, "wb") as f:
+                f.write(decoded_content)
 
             return dict(status='OK', data=f"Name: {filename} Terupload di files/{filename}")
         except Exception as e:
-            return dict(status='ERROR',data=str(e))
+            return dict(status='ERROR', data=str(e))
 
-if __name__=='__main__':
+    def hapus(self, params=[]) -> dict:
+        try:
+            if (len(params) != 1):
+                raise Exception('Please provide correct params: <FILENAME>')
+
+            filename = params[0]
+            if (filename == ''):
+                raise Exception('Filename must not be empty')
+
+            if os.path.isfile(filename):
+                os.remove(filename)
+            else:
+                raise Exception('File not found')
+
+            return dict(status='OK', data=f"Name: {filename} Terhapus")
+        except Exception as e:
+            return dict(status='ERROR', data=str(e))
+
+
+if __name__ == '__main__':
     file = open('normal_img.jpg', 'rb')
     cc = base64.b64encode(file.read())
 

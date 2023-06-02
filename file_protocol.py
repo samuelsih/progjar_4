@@ -26,14 +26,17 @@ class FileProtocol:
         c = shlex.split(string_datamasuk.lower())
         try:
             c_request = c[0].strip()
-            logging.warning(f"memproses request: {c_request}")
+            match c_request:
+                case "upload":
+                    content = string_datamasuk.split(' ')[2]
+                    params = [c[1], content]
 
-            if c_request == 'upload':
-                content = string_datamasuk.split(' ')[2]
-                params = [c[1], content]
-            
-            else:
-                params = [x for x in c[1:]]
+                case "hapus":
+                    content = string_datamasuk.split(' ')[1]
+                    params = [c[1]]
+
+                case _:
+                    params = [x for x in c[1:]]
 
             cl = getattr(self.file,c_request)(params)
             return json.dumps(cl)
@@ -46,6 +49,4 @@ if __name__=='__main__':
     fp = FileProtocol()
     # print(fp.proses_string("LIST"))
     # print(fp.proses_string("GET pokijan.jpg"))
-    file = open('../normal_img.jpg', 'rb')
-    cc = base64.b64encode(file.read()).decode()
-    print(fp.proses_string(f"UPLOAD normal_img.jpg {cc}"))
+    # print(fp.proses_string(f"HAPUS testfile.txt"))
